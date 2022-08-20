@@ -33,7 +33,6 @@ public class CurrentWeatherFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        WeatherViewModel viewModel = new ViewModelProvider(this).get(WeatherViewModel.class);
     }
 
     @Override
@@ -45,10 +44,12 @@ public class CurrentWeatherFragment extends Fragment {
 
         TextView tempWidget = inflatedView.findViewById(R.id.current_temp);
         TextView dewpointWidget = inflatedView.findViewById(R.id.current_dewpt);
+        TextView cloudWidget = inflatedView.findViewById(R.id.current_clouds);
 
         WeatherData.latestReport().observe(getViewLifecycleOwner(), report -> {
-            tempWidget.setText(Double.toString(report.current.currentTemp));
-            dewpointWidget.setText(Double.toString(report.current.currentDewpoint));
+            tempWidget.setText(String.format("%.0f°F", report.current.temperature));
+            dewpointWidget.setText(getResources().getString(Utils.getDewpointStringId(report.current.dewpoint)));
+            cloudWidget.setText(getResources().getString(Utils.getCloudinessStringId(report.current.clouds)));
         });
 
         return inflatedView;

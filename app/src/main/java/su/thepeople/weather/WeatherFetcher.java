@@ -7,6 +7,8 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.net.URL;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.function.Supplier;
@@ -53,9 +55,19 @@ public class WeatherFetcher {
     private WeatherReport processResult(JSONObject result) {
         WeatherReport report = new WeatherReport();
         try {
+
+            // Data that applies to all times
+            int offsetL = result.getInt("timezone_offset");
+            ZoneOffset offset = ZoneOffset.ofTotalSeconds(offsetL);
+
+            // Data that applies to current conditions
             JSONObject current = result.getJSONObject("current");
-            report.current.currentTemp = current.getDouble("temp");
-            report.current.currentDewpoint = current.getDouble("dew_point");
+            report.current.when = LocalDateTime.ofEpochSecond(current.getLong("dt"), 0, offset);
+            report.current.temperature = current.getDouble("temp");
+            report.current.dewpoint = current.getDouble("dew_point");
+            report.current.clouds = current.getDouble("clouds");
+            report.current.windSpeed = current.getDouble("wind_speed");
+            report.current.windDirection = current.getDouble("wind_deg");
         } catch (JSONException e) {
             // Malformed result!
         }
@@ -66,7 +78,7 @@ public class WeatherFetcher {
         isWaiting = false;
         Log.d("DEBUGGER", fetchResult.toString());
         WeatherReport report = processResult(fetchResult);
-        Log.d("report from fetcher", Double.toString(report.current.currentTemp));
+        Log.d("report from fetcher", Double.toString(report.current.temperature));
         messagePasser.sendNewWeatherReport(report);
     }
 

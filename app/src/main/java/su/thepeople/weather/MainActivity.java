@@ -67,9 +67,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void onNewWeatherReportReceived(WeatherReport newReport) {
-        Log.d("main", Double.toString(newReport.current.currentTemp));
+        Log.d("main", Double.toString(newReport.current.temperature));
         weatherReport.setValue(newReport);
         WeatherData.latestReport().setValue(newReport);
-        Log.d("main after", Double.toString(newReport.current.currentTemp));
+        Log.d("main after", Double.toString(newReport.current.temperature));
     }
 }
