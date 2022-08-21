@@ -15,7 +15,14 @@ public class WeatherReport implements Serializable {
         public double clouds;
     }
 
+    public static class DailyForecast extends Conditions {
+        public double lowTemperature;
+        public double highTemperature;
+    }
+
     public Conditions current = new Conditions();
 
     public List<Conditions> hourly = new ArrayList<>();
+
+    public List<DailyForecast> daily = new ArrayList<>();
 }

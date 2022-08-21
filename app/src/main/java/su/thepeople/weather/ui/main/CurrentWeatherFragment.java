@@ -11,46 +11,35 @@ import android.widget.TextView;
 
 import su.thepeople.weather.R;
 import su.thepeople.weather.WeatherData;
+import su.thepeople.weather.WeatherReport;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link CurrentWeatherFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class CurrentWeatherFragment extends Fragment {
 
     public CurrentWeatherFragment() {
         // Required empty public constructor
     }
 
-    public static CurrentWeatherFragment newInstance() {
-        CurrentWeatherFragment fragment = new CurrentWeatherFragment();
-        // TODO: is this necessary?
-        fragment.setArguments(new Bundle());
-        return fragment;
-    }
+    private TextView tempWidget;
+    private TextView dewpointWidget;
+    private TextView cloudWidget;
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    private void updateWidgets(WeatherReport report) {
+        tempWidget.setText(Utils.getTemperatureString(report.current.temperature));
+        dewpointWidget.setText(getResources().getString(Utils.getDewpointStringId(report.current.dewpoint)));
+        cloudWidget.setText(getResources().getString(Utils.getCloudinessStringId(report.current.clouds)));
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        // Inflate the layout for this fragment
         View inflatedView = inflater.inflate(R.layout.fragment_current_weather, container, false);
 
-        TextView tempWidget = inflatedView.findViewById(R.id.current_temp);
-        TextView dewpointWidget = inflatedView.findViewById(R.id.current_dewpt);
-        TextView cloudWidget = inflatedView.findViewById(R.id.current_clouds);
+        tempWidget = inflatedView.findViewById(R.id.current_temp);
+        dewpointWidget = inflatedView.findViewById(R.id.current_dewpt);
+        cloudWidget = inflatedView.findViewById(R.id.current_clouds);
 
-        WeatherData.latestReport().observe(getViewLifecycleOwner(), report -> {
-            tempWidget.setText(Utils.getTemperatureString(report.current.temperature));
-            dewpointWidget.setText(getResources().getString(Utils.getDewpointStringId(report.current.dewpoint)));
-            cloudWidget.setText(getResources().getString(Utils.getCloudinessStringId(report.current.clouds)));
-        });
+        WeatherData.latestReport().observe(getViewLifecycleOwner(), this::updateWidgets);
 
         return inflatedView;
     }

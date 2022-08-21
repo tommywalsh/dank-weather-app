@@ -1,5 +1,7 @@
 package su.thepeople.weather;
 
+import androidx.annotation.NonNull;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -7,6 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringJoiner;
 
+/**
+ * Helper class to handle the boilerplate involved in constructing a URL query
+ */
 public class URLBuilder {
 
     private static class NVPair {
@@ -26,6 +31,7 @@ public class URLBuilder {
         params = new ArrayList<>();
     }
 
+    @NonNull
     public static URLBuilder url() {
         return new URLBuilder();
     }
@@ -53,12 +59,14 @@ public class URLBuilder {
         }
     }
 
-    private static String getSingleParamString(NVPair param) {
+    @NonNull
+    private static String getSingleParamString(@NonNull NVPair param) {
         String quotedName = encode(param.name);
         String quotedValue = encode(param.value);
         return String.format("%s=%s", quotedName, quotedValue);
     }
 
+    @NonNull
     private String getFullParamString() {
         StringJoiner joiner = new StringJoiner("&");
         for (NVPair param : params) {

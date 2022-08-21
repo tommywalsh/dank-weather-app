@@ -11,6 +11,9 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.stream.Collectors;
 
+/**
+ * Helper class to handle making HTTPS calls to a remote server
+ */
 public class NetworkCaller {
 
     private static String toString(InputStream stream) {

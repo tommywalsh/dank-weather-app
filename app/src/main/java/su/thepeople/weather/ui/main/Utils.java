@@ -14,11 +14,19 @@ public class Utils {
         return String.format("%s°", roundedDecimal.format(temperature));
     }
 
+    public static String getHighLowTemperatureString(double highTemp, double lowTemp) {
+        return String.format("%s°/%s°", roundedDecimal.format(lowTemp), roundedDecimal.format(highTemp));
+    }
+
     private static final DateTimeFormatter hourOnlyFormatter = DateTimeFormatter.ofPattern("h a");
 
     public static String getHourString(LocalDateTime dt) {
         return dt.format(hourOnlyFormatter);
     }
+
+    private static final DateTimeFormatter dayOnlyFormatter = DateTimeFormatter.ofPattern("E");
+
+    public static String getDayString(LocalDateTime dt) { return dt.format(dayOnlyFormatter); }
 
     public static int getDewpointStringId(double dewpoint) {
         if (dewpoint >= 70.0) {

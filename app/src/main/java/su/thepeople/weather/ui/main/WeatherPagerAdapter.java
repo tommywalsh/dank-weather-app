@@ -8,48 +8,54 @@ import androidx.annotation.StringRes;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
-import androidx.lifecycle.LiveData;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Supplier;
 
 import su.thepeople.weather.R;
-import su.thepeople.weather.WeatherReport;
 
 @SuppressWarnings("deprecation")
 public class WeatherPagerAdapter extends FragmentPagerAdapter {
 
-    @StringRes
-    private static final int[] TAB_TITLES = new int[]{R.string.tab_text_now, R.string.tab_text_today, R.string.tab_text_future};
-    private final Context mContext;
-    private final LiveData<WeatherReport> weatherReport;
+    private static class TabDefinition {
+        @StringRes public int titleStringId;
+        public Supplier<Fragment> fragmentCreator;
+        public TabDefinition(@StringRes int titleStringId, Supplier<Fragment> fragmentCreator) {
+            this.titleStringId = titleStringId;
+            this.fragmentCreator = fragmentCreator;
+        }
+    }
 
-    public WeatherPagerAdapter(Context context, FragmentManager fm, LiveData<WeatherReport> weatherReport) {
+    private static final List<TabDefinition> tabDefinitions = new ArrayList<>();
+
+    private final Context context;
+
+    public WeatherPagerAdapter(Context context, FragmentManager fm) {
         super(fm);
-        mContext = context;
-        this.weatherReport = weatherReport;
+        this.context = context;
+
+        tabDefinitions.add(new TabDefinition(R.string.tab_text_now, CurrentWeatherFragment::new));
+        tabDefinitions.add(new TabDefinition(R.string.tab_text_today, HourlyWeatherFragment::new));
+        tabDefinitions.add(new TabDefinition(R.string.tab_text_future, DailyWeatherFragment::new));
     }
 
     @NonNull
     @Override
     public Fragment getItem(int position) {
-        Fragment fragment;
-        if (position == 0) {
-            fragment = CurrentWeatherFragment.newInstance();
-        } else if (position == 1) {
-            fragment = new HourlyWeatherFragment();
-        } else {
-            fragment = PlaceholderFragment.newInstance(weatherReport);
-        }
-        return fragment;
+        assert position <= tabDefinitions.size();
+        return tabDefinitions.get(position).fragmentCreator.get();
     }
 
     @Nullable
     @Override
     public CharSequence getPageTitle(int position) {
-        return mContext.getResources().getString(TAB_TITLES[position]);
+        assert position <= tabDefinitions.size();
+        return context.getResources().getString(tabDefinitions.get(position).titleStringId);
     }
 
     @Override
     public int getCount() {
-        return TAB_TITLES.length;
+        return tabDefinitions.size();
     }
-
 }

@@ -1,7 +1,5 @@
 package su.thepeople.weather;
 
-import android.util.Log;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -16,7 +14,6 @@ import java.util.function.Supplier;
 
 /**
  * Fetches weather reports from an external server.
- *
  */
 public class WeatherFetcher {
 
@@ -70,7 +67,7 @@ public class WeatherFetcher {
             report.current.windSpeed = current.getDouble("wind_speed");
             report.current.windDirection = current.getDouble("wind_deg");
 
-            // Data that applies to hourly forecast
+            // Data that applies to hourly forecasts
             JSONArray hourly = result.getJSONArray("hourly");
             for (int i = 0; i < hourly.length(); ++i) {
                 JSONObject thisHour = hourly.getJSONObject(i);
@@ -86,6 +83,23 @@ public class WeatherFetcher {
                 report.hourly.add(thisForecast);
             }
 
+            // Data that applies to daily forecasts
+            JSONArray daily = result.getJSONArray("daily");
+            for (int i = 0; i < daily.length(); ++i) {
+                JSONObject thisDay = daily.getJSONObject(i);
+                WeatherReport.DailyForecast thisForecast = new WeatherReport.DailyForecast();
+                thisForecast.when = LocalDateTime.ofEpochSecond(thisDay.getLong("dt"), 0, offset);
+                JSONObject thisTemp = thisDay.getJSONObject("temp");
+                thisForecast.temperature = thisTemp.getDouble("day");
+                thisForecast.highTemperature = thisTemp.getDouble("max");
+                thisForecast.lowTemperature = thisTemp.getDouble("min");
+                thisForecast.dewpoint = thisDay.getDouble("dew_point");
+                thisForecast.clouds = thisDay.getDouble("clouds");
+                thisForecast.windSpeed = thisDay.getDouble("wind_speed");
+                thisForecast.windDirection = thisDay.getDouble("wind_deg");
+
+                report.daily.add(thisForecast);
+            }
         } catch (JSONException e) {
             // Malformed result!
         }
@@ -94,9 +108,7 @@ public class WeatherFetcher {
 
     private void onFetchCompleted(JSONObject fetchResult) {
         isWaiting = false;
-        Log.d("DEBUGGER", fetchResult.toString());
         WeatherReport report = processResult(fetchResult);
-        Log.d("report from fetcher", Double.toString(report.current.temperature));
         messagePasser.sendNewWeatherReport(report);
     }
 
