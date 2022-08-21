@@ -33,8 +33,8 @@ public class WeatherPagerAdapter extends FragmentPagerAdapter {
         Fragment fragment;
         if (position == 0) {
             fragment = CurrentWeatherFragment.newInstance();
-        /*} else if (position == 1) {
-            fragment = HourlyWeatherFragment.newInstance(1);*/
+        } else if (position == 1) {
+            fragment = new HourlyWeatherFragment();
         } else {
             fragment = PlaceholderFragment.newInstance(weatherReport);
         }

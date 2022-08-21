@@ -2,6 +2,8 @@ package su.thepeople.weather;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 public class WeatherReport implements Serializable {
     public static class Conditions implements Serializable {
@@ -14,4 +16,6 @@ public class WeatherReport implements Serializable {
     }
 
     public Conditions current = new Conditions();
+
+    public List<Conditions> hourly = new ArrayList<>();
 }

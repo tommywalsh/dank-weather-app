@@ -47,7 +47,7 @@ public class CurrentWeatherFragment extends Fragment {
         TextView cloudWidget = inflatedView.findViewById(R.id.current_clouds);
 
         WeatherData.latestReport().observe(getViewLifecycleOwner(), report -> {
-            tempWidget.setText(String.format("%.0f°F", report.current.temperature));
+            tempWidget.setText(Utils.getTemperatureString(report.current.temperature));
             dewpointWidget.setText(getResources().getString(Utils.getDewpointStringId(report.current.dewpoint)));
             cloudWidget.setText(getResources().getString(Utils.getCloudinessStringId(report.current.clouds)));
         });

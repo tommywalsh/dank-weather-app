@@ -2,6 +2,7 @@ package su.thepeople.weather;
 
 import android.util.Log;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -68,6 +69,23 @@ public class WeatherFetcher {
             report.current.clouds = current.getDouble("clouds");
             report.current.windSpeed = current.getDouble("wind_speed");
             report.current.windDirection = current.getDouble("wind_deg");
+
+            // Data that applies to hourly forecast
+            JSONArray hourly = result.getJSONArray("hourly");
+            for (int i = 0; i < hourly.length(); ++i) {
+                JSONObject thisHour = hourly.getJSONObject(i);
+                WeatherReport.Conditions thisForecast = new WeatherReport.Conditions();
+                thisForecast.when = LocalDateTime.ofEpochSecond(thisHour.getLong("dt"), 0, offset);
+                thisForecast.temperature = thisHour.getDouble("temp");
+                thisForecast.dewpoint = thisHour.getDouble("dew_point");
+                thisForecast.clouds = thisHour.getDouble("clouds");
+                thisForecast.windSpeed = thisHour.getDouble("wind_speed");
+                thisForecast.windDirection = thisHour.getDouble("wind_deg");
+
+                // TODO: Check to see if this JSON array is really always in chronological order!
+                report.hourly.add(thisForecast);
+            }
+
         } catch (JSONException e) {
             // Malformed result!
         }

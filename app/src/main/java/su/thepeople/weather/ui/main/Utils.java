@@ -1,8 +1,24 @@
 package su.thepeople.weather.ui.main;
 
+import java.text.DecimalFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 import su.thepeople.weather.R;
 
 public class Utils {
+
+    private static final DecimalFormat roundedDecimal = new DecimalFormat("###");
+
+    public static String getTemperatureString(double temperature) {
+        return String.format("%s°", roundedDecimal.format(temperature));
+    }
+
+    private static final DateTimeFormatter hourOnlyFormatter = DateTimeFormatter.ofPattern("h a");
+
+    public static String getHourString(LocalDateTime dt) {
+        return dt.format(hourOnlyFormatter);
+    }
 
     public static int getDewpointStringId(double dewpoint) {
         if (dewpoint >= 70.0) {
