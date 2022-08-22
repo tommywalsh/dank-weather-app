@@ -66,18 +66,29 @@ public class WeatherFetcher {
             report.current.clouds = current.getDouble("clouds");
             report.current.windSpeed = current.getDouble("wind_speed");
             report.current.windDirection = current.getDouble("wind_deg");
+            JSONArray currentWeather = current.getJSONArray("weather");
+            if (currentWeather.length() > 0) {
+                JSONObject primaryWeather = currentWeather.getJSONObject(0);
+                report.current.weatherCode = primaryWeather.getInt("id");
+            }
 
             // Data that applies to hourly forecasts
             JSONArray hourly = result.getJSONArray("hourly");
             for (int i = 0; i < hourly.length(); ++i) {
                 JSONObject thisHour = hourly.getJSONObject(i);
-                WeatherReport.Conditions thisForecast = new WeatherReport.Conditions();
+                WeatherReport.Forecast thisForecast = new WeatherReport.Forecast();
                 thisForecast.when = LocalDateTime.ofEpochSecond(thisHour.getLong("dt"), 0, offset);
                 thisForecast.temperature = thisHour.getDouble("temp");
                 thisForecast.dewpoint = thisHour.getDouble("dew_point");
                 thisForecast.clouds = thisHour.getDouble("clouds");
                 thisForecast.windSpeed = thisHour.getDouble("wind_speed");
                 thisForecast.windDirection = thisHour.getDouble("wind_deg");
+                thisForecast.pop = thisHour.getDouble("pop");
+                JSONArray hourlyWeather = thisHour.getJSONArray("weather");
+                if (hourlyWeather.length() > 0) {
+                    JSONObject primaryWeather = hourlyWeather.getJSONObject(0);
+                    thisForecast.weatherCode = primaryWeather.getInt("id");
+                }
 
                 // TODO: Check to see if this JSON array is really always in chronological order!
                 report.hourly.add(thisForecast);
@@ -97,6 +108,13 @@ public class WeatherFetcher {
                 thisForecast.clouds = thisDay.getDouble("clouds");
                 thisForecast.windSpeed = thisDay.getDouble("wind_speed");
                 thisForecast.windDirection = thisDay.getDouble("wind_deg");
+                thisForecast.pop = thisDay.getDouble("pop");
+
+                JSONArray dailyWeather = thisDay.getJSONArray("weather");
+                if (dailyWeather.length() > 0) {
+                    JSONObject primaryWeather = dailyWeather.getJSONObject(0);
+                    thisForecast.weatherCode = primaryWeather.getInt("id");
+                }
 
                 report.daily.add(thisForecast);
             }

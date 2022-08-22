@@ -13,16 +13,21 @@ public class WeatherReport implements Serializable {
         public double windSpeed;
         public double windDirection;
         public double clouds;
+        public int weatherCode;
     }
 
-    public static class DailyForecast extends Conditions {
+    public static class Forecast extends Conditions {
+        public double pop;
+    }
+
+    public static class DailyForecast extends Forecast {
         public double lowTemperature;
         public double highTemperature;
     }
 
     public Conditions current = new Conditions();
 
-    public List<Conditions> hourly = new ArrayList<>();
+    public List<Forecast> hourly = new ArrayList<>();
 
     public List<DailyForecast> daily = new ArrayList<>();
 }

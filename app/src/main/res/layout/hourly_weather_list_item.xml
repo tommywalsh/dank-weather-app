@@ -3,36 +3,58 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:divider="@color/black"
+    android:dividerPadding="5dp"
     android:orientation="horizontal"
-    tools:context=".ui.main.CurrentWeatherFragment" >
+    tools:context=".ui.main.CurrentWeatherFragment">
 
     <TextView
         android:id="@+id/hourlyTime"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="0.5"
-        android:textAlignment="textEnd" />
+        android:layout_weight="1"
+        android:gravity="center"
+        android:maxLines="1"/>
 
     <TextView
         android:id="@+id/hourlyTemp"
         android:layout_width="0px"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:textAlignment="textEnd"
+        android:gravity="center"
+        android:maxLines="1"
+        android:textAlignment="center"
         android:textSize="20sp"
         android:textStyle="bold" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="2"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/hourly_weather_summary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/hourly_weather_details"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:textAlignment="center" />
+    </LinearLayout>
 
     <TextView
         android:id="@+id/hourlyDewpt"
         android:layout_width="0px"
         android:layout_height="wrap_content"
         android:layout_weight="1"
+        android:gravity="center"
         android:textAlignment="center" />
 
-    <TextView
-        android:id="@+id/hourlyClouds"
-        android:layout_width="0px"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:textAlignment="textStart" />
 </LinearLayout>

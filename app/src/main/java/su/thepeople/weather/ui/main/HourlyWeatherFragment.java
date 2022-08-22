@@ -69,14 +69,16 @@ public class HourlyWeatherFragment extends Fragment {
         public TextView hourWidget;
         public TextView tempWidget;
         public TextView dewpointWidget;
-        public TextView cloudWidget;
+        public TextView weatherSummaryWidget;
+        public TextView weatherDetailsWidget;
 
         public HourlyWeatherViewHolder(@NonNull View itemView) {
             super(itemView);
             hourWidget = itemView.findViewById(R.id.hourlyTime);
             tempWidget = itemView.findViewById(R.id.hourlyTemp);
             dewpointWidget = itemView.findViewById(R.id.hourlyDewpt);
-            cloudWidget = itemView.findViewById(R.id.hourlyClouds);
+            weatherSummaryWidget = itemView.findViewById(R.id.hourly_weather_summary);
+            weatherDetailsWidget = itemView.findViewById(R.id.hourly_weather_details);
         }
     }
 
@@ -85,7 +87,7 @@ public class HourlyWeatherFragment extends Fragment {
      * is the WeatherData object (which holds the most-recently-received weather report).  We'll
      * use our custom ViewHolder class to update item views as necessary.
      */
-    private static class HourlyWeatherAdapter extends RecyclerView.Adapter<HourlyWeatherViewHolder> {
+    private class HourlyWeatherAdapter extends RecyclerView.Adapter<HourlyWeatherViewHolder> {
 
         /**
          * When the RecyclerView starts up (and maybe at other times during its lifecycle), it will
@@ -114,12 +116,21 @@ public class HourlyWeatherFragment extends Fragment {
         @Override
         public void onBindViewHolder(@NonNull HourlyWeatherViewHolder holder, int position) {
             WeatherReport report = WeatherData.latestReport().getValue();
-            WeatherReport.Conditions forecast = (report == null) ? new WeatherReport.Conditions() : report.hourly.get(position);
+            WeatherReport.Forecast forecast = (report == null) ? new WeatherReport.Forecast() : report.hourly.get(position);
 
             holder.hourWidget.setText(Utils.getHourString(forecast.when));
             holder.tempWidget.setText(Utils.getTemperatureString(forecast.temperature));
             holder.dewpointWidget.setText(Utils.getDewpointStringId(forecast.dewpoint));
-            holder.cloudWidget.setText(Utils.getCloudinessStringId(forecast.clouds));
+
+            int detailId = getResources().getIdentifier(Utils.getWeatherCodeLookupString(forecast.weatherCode), "string", getContext().getPackageName());
+            int groupId = getResources().getIdentifier(Utils.getWeatherCodeGroupLookupString(forecast.weatherCode), "string", getContext().getPackageName());
+            if (detailId == 0 || groupId == 0) {
+                holder.weatherSummaryWidget.setText("");
+                holder.weatherDetailsWidget.setText("");
+            } else {
+                holder.weatherSummaryWidget.setText(Utils.getGeneralWeatherDescriptionId(HourlyWeatherFragment.this, forecast.weatherCode, forecast.clouds));
+                holder.weatherDetailsWidget.setText(Utils.getWeatherDetailsString(HourlyWeatherFragment.this, forecast.weatherCode, forecast.pop));
+            }
         }
 
         /**

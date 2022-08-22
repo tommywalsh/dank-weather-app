@@ -28,7 +28,8 @@ public class DailyWeatherFragment extends Fragment {
         public TextView dayTempWidget;
         public TextView highLowWidget;
         public TextView dewpointWidget;
-        public TextView cloudWidget;
+        public TextView summaryWidget;
+        public TextView popWidget;
 
         public DailyWeatherViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -36,11 +37,12 @@ public class DailyWeatherFragment extends Fragment {
             dayTempWidget = itemView.findViewById(R.id.dailyDayTemp);
             highLowWidget = itemView.findViewById(R.id.dailyHighLowTemp);
             dewpointWidget = itemView.findViewById(R.id.dailyDewpt);
-            cloudWidget = itemView.findViewById(R.id.dailyClouds);
+            summaryWidget = itemView.findViewById(R.id.daily_condition_summary);
+            popWidget = itemView.findViewById(R.id.daily_pop);
         }
     }
 
-    private static class DailyWeatherAdapter extends RecyclerView.Adapter<DailyWeatherViewHolder> {
+    private class DailyWeatherAdapter extends RecyclerView.Adapter<DailyWeatherViewHolder> {
         @NonNull
         @Override
         public DailyWeatherViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -57,7 +59,9 @@ public class DailyWeatherFragment extends Fragment {
             holder.dayTempWidget.setText(Utils.getTemperatureString(forecast.temperature));
             holder.highLowWidget.setText(Utils.getHighLowTemperatureString(forecast.highTemperature, forecast.lowTemperature));
             holder.dewpointWidget.setText(Utils.getDewpointStringId(forecast.dewpoint));
-            holder.cloudWidget.setText(Utils.getCloudinessStringId(forecast.clouds));
+
+            holder.summaryWidget.setText(Utils.getGeneralWeatherDescriptionId(DailyWeatherFragment.this, forecast.weatherCode, forecast.clouds));
+            holder.popWidget.setText(Utils.getPopString(DailyWeatherFragment.this, forecast.pop));
         }
 
         @Override

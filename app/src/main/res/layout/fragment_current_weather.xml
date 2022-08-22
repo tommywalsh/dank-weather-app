@@ -30,6 +30,21 @@
         android:textStyle="bold" />
 
     <TextView
+        android:id="@+id/current_weather_summary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:textSize="48sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/current_weather_details"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:textSize="20sp" />
+
+    <TextView
         android:id="@+id/current_dewpt"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

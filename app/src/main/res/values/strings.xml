@@ -18,7 +18,7 @@
     <string name="clouds_3_to_5_eighths">Partly Cloudy</string>
     <string name="clouds_1_to_2_eighths">Mostly Clear</string>
     <string name="clouds_bottom_eighth">Clear</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="pop">pop</string>
 
 </resources>

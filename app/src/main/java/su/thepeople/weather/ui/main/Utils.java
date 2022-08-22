@@ -1,5 +1,7 @@
 package su.thepeople.weather.ui.main;
 
+import androidx.fragment.app.Fragment;
+
 import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -41,6 +43,62 @@ public class Utils {
             return R.string.dew_pt_below_40;
         }
     }
+
+    public static String getWeatherCodeLookupString(int weatherCode) {
+        return String.format("weather_code_%d", weatherCode);
+    }
+
+    private static int getWeatherGroupCode(int weatherCode) {
+        return (weatherCode / 100) * 100;
+    }
+    public static String getWeatherCodeGroupLookupString(int weatherCode) {
+        return String.format("weather_group_%d", getWeatherGroupCode(weatherCode));
+    }
+
+    private static final int NO_PRECIP_GROUP_CODE = 800;
+
+    private static int getResourceId(Fragment ui, String resourceName) {
+        return ui.getResources().getIdentifier(resourceName, "string", ui.getContext().getPackageName());
+    }
+
+    public static int getGeneralWeatherDescriptionId(Fragment ui, int weatherCode, double cloudCover) {
+        int groupCode = getWeatherGroupCode(weatherCode);
+        if (groupCode == NO_PRECIP_GROUP_CODE) {
+            // When there's no precipitation, we report the cloud cover
+            return getCloudinessStringId(cloudCover);
+        } else {
+            return getResourceId(ui, getWeatherCodeGroupLookupString(weatherCode));
+        }
+    }
+
+    public static int getWeatherSummaryId(Fragment ui, int weatherCode) {
+        int groupCode = getWeatherGroupCode(weatherCode);
+        if (groupCode == NO_PRECIP_GROUP_CODE) {
+            // When there's no precipitation, we report the cloudiness (which is the weather code)
+            return getResourceId(ui, getWeatherCodeLookupString(weatherCode));
+        } else {
+            // When there is precipitation, we report the precipitation type (the group)
+            return getResourceId(ui, getWeatherCodeGroupLookupString(weatherCode));
+        }
+    }
+
+    public static String getPopString(Fragment ui, double pop) {
+        String popString = ui.getResources().getString(R.string.pop);
+        return String.format("%s: %s%%", popString, roundedDecimal.format(pop*100.0));
+    }
+
+    public static String getWeatherDetailsString(Fragment ui, int weatherCode, double pop) {
+        int groupCode = getWeatherGroupCode(weatherCode);
+        if (groupCode == NO_PRECIP_GROUP_CODE) {
+            // When there's no precipitation, we report the precipitation chance
+            return getPopString(ui, pop);
+        } else {
+            // When there is precipitation, we report the precipitation details (the weather code)
+            int id = getResourceId(ui, getWeatherCodeLookupString(weatherCode));
+            return ui.getResources().getString(id);
+        }
+    }
+
 
     public static int getCloudinessStringId(double cloudCover) {
         /*
