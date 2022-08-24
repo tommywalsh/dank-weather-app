@@ -26,6 +26,14 @@ public class CurrentWeatherFragment extends Fragment {
     private TextView weatherDetailsWidget;
 
     private void updateWidgets(WeatherReport report) {
+        if (report == null) {
+            tempWidget.setText("");
+            dewpointWidget.setText("");
+            cloudWidget.setText("");
+            weatherSummaryWidget.setText("");
+            weatherDetailsWidget.setText("");
+            return;
+        }
         tempWidget.setText(Utils.getTemperatureString(report.current.temperature));
         dewpointWidget.setText(getResources().getString(Utils.getDewpointStringId(report.current.dewpoint)));
         cloudWidget.setText(getResources().getString(Utils.getCloudinessStringId(report.current.clouds)));
