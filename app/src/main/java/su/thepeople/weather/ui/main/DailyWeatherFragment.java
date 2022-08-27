@@ -58,16 +58,32 @@ public class DailyWeatherFragment extends Fragment {
             holder.dayWidget.setText(Utils.getDayString(forecast.when));
             holder.dayTempWidget.setText(Utils.getTemperatureString(forecast.temperature));
             holder.highLowWidget.setText(Utils.getHighLowTemperatureString(forecast.highTemperature, forecast.lowTemperature));
-            holder.dewpointWidget.setText(Utils.getDewpointStringId(forecast.dewpoint));
-
-            holder.summaryWidget.setText(Utils.getGeneralWeatherDescriptionId(DailyWeatherFragment.this, forecast.weatherCode, forecast.clouds));
             holder.popWidget.setText(Utils.getPopString(DailyWeatherFragment.this, forecast.pop));
+
+            int groupId = Utils.getWeatherGroupCode(forecast.weatherCode);
+            if (groupId == 800) {
+                // For non-precipitation, we give the detailed condition (the weather code)
+                holder.summaryWidget.setText(Utils.getResourceId(DailyWeatherFragment.this, Utils.getWeatherCodeLookupString(forecast.weatherCode)));
+            } else {
+                // Otherwise, just a general description is good (the weather group)
+                holder.summaryWidget.setText(Utils.getResourceId(DailyWeatherFragment.this, Utils.getWeatherCodeGroupLookupString(forecast.weatherCode)));
+            }
+
+            if (groupId == 800) {
+                // For non-precipitation, we give the dewpoint
+                holder.dewpointWidget.setText(Utils.getDewpointStringId(forecast.dewpoint));
+            } else if (groupId == 600) {
+                // For snow days, we give the accumulation
+                holder.dewpointWidget.setText(Utils.getSnowString(forecast.snowAccumulation));
+            } else {
+                holder.dewpointWidget.setText("");
+            }
         }
 
         @Override
         public int getItemCount() {
             WeatherReport latestReport = WeatherData.latestReport().getValue();
-            return (latestReport == null) ? 0 : Math.min(latestReport.daily.size(), 6);
+            return (latestReport == null) ? 0 : Math.min(latestReport.daily.size(), 7);
         }
     }
 

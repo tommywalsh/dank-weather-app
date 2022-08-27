@@ -110,6 +110,9 @@ public class WeatherFetcher {
                 thisForecast.windDirection = thisDay.getDouble("wind_deg");
                 thisForecast.pop = thisDay.getDouble("pop");
 
+                // Snow is always given in mm even when we're requesting imperial units
+                thisForecast.snowAccumulation = thisDay.has("snow") ? thisDay.getDouble("snow") / 25.4 : 0.0;
+
                 JSONArray dailyWeather = thisDay.getJSONArray("weather");
                 if (dailyWeather.length() > 0) {
                     JSONObject primaryWeather = dailyWeather.getJSONObject(0);

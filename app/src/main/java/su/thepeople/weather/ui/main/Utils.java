@@ -16,6 +16,10 @@ public class Utils {
         return String.format("%s°", roundedDecimal.format(temperature));
     }
 
+    public static String getSnowString(double snowInInches) {
+        return String.format("%s\"", roundedDecimal.format(snowInInches));
+    }
+
     public static String getHighLowTemperatureString(double highTemp, double lowTemp) {
         return String.format("%s°/%s°", roundedDecimal.format(lowTemp), roundedDecimal.format(highTemp));
     }
@@ -48,16 +52,17 @@ public class Utils {
         return String.format("weather_code_%d", weatherCode);
     }
 
-    private static int getWeatherGroupCode(int weatherCode) {
+    public static int getWeatherGroupCode(int weatherCode) {
         return (weatherCode / 100) * 100;
     }
+
     public static String getWeatherCodeGroupLookupString(int weatherCode) {
         return String.format("weather_group_%d", getWeatherGroupCode(weatherCode));
     }
 
     private static final int NO_PRECIP_GROUP_CODE = 800;
 
-    private static int getResourceId(Fragment ui, String resourceName) {
+    public static int getResourceId(Fragment ui, String resourceName) {
         return ui.getResources().getIdentifier(resourceName, "string", ui.getContext().getPackageName());
     }
 

@@ -37,6 +37,7 @@ public class WeatherReport implements Serializable {
     public static class DailyForecast extends Forecast {
         public double lowTemperature;
         public double highTemperature;
+        public double snowAccumulation;
     }
 
     public Conditions current = new Conditions();

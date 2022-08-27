@@ -20,33 +20,45 @@ public class CurrentWeatherFragment extends Fragment {
     }
 
     private TextView tempWidget;
-    private TextView dewpointWidget;
-    private TextView cloudWidget;
     private TextView weatherSummaryWidget;
     private TextView weatherDetailsWidget;
 
     private void updateWidgets(WeatherReport report) {
         if (report == null) {
             tempWidget.setText("");
-            dewpointWidget.setText("");
-            cloudWidget.setText("");
             weatherSummaryWidget.setText("");
             weatherDetailsWidget.setText("");
             return;
         }
         tempWidget.setText(Utils.getTemperatureString(report.current.temperature));
-        dewpointWidget.setText(getResources().getString(Utils.getDewpointStringId(report.current.dewpoint)));
-        cloudWidget.setText(getResources().getString(Utils.getCloudinessStringId(report.current.clouds)));
 
-        int detailId = getResources().getIdentifier(Utils.getWeatherCodeLookupString(report.current.weatherCode), "string", getContext().getPackageName());
-        int groupId = getResources().getIdentifier(Utils.getWeatherCodeGroupLookupString(report.current.weatherCode), "string", getContext().getPackageName());
-        if (detailId == 0 || groupId == 0) {
-            weatherSummaryWidget.setText("");
+        int groupId = Utils.getWeatherGroupCode(report.current.weatherCode);
+
+        if (groupId == 300) {
+            // For Drizzle, we don't need to know details
+            weatherSummaryWidget.setText(Utils.getResourceId(this, Utils.getWeatherCodeGroupLookupString(report.current.weatherCode)));
             weatherDetailsWidget.setText("");
         } else {
-            weatherSummaryWidget.setText(getResources().getString(groupId));
-            weatherDetailsWidget.setText(getResources().getString(detailId));
+            // For every other weather type, we want details
+            weatherSummaryWidget.setText(Utils.getResourceId(this, Utils.getWeatherCodeLookupString(report.current.weatherCode)));
+
+            if (groupId == 600) {
+                // For snow, we want to know accumulation for the day
+                double snowTotal = 0.0;
+                if (!report.daily.isEmpty()) {
+                    snowTotal = report.daily.get(0).snowAccumulation;
+                }
+                weatherDetailsWidget.setText(Utils.getSnowString(snowTotal)); // TODO: where to get this data?
+            } else if (groupId == 800) {
+                // If no precipitation, we want to know about humidity
+                weatherDetailsWidget.setText(Utils.getDewpointStringId(report.current.dewpoint));
+            } else {
+                // Otherwise, no additional info is needed
+                weatherDetailsWidget.setText("Test");
+            }
         }
+
+
     }
 
     @Override
@@ -58,8 +70,6 @@ public class CurrentWeatherFragment extends Fragment {
         tempWidget = inflatedView.findViewById(R.id.current_temp);
         weatherSummaryWidget = inflatedView.findViewById(R.id.current_weather_summary);
         weatherDetailsWidget = inflatedView.findViewById(R.id.current_weather_details);
-        dewpointWidget = inflatedView.findViewById(R.id.current_dewpt);
-        cloudWidget = inflatedView.findViewById(R.id.current_clouds);
 
         WeatherData.latestReport().observe(getViewLifecycleOwner(), this::updateWidgets);
 

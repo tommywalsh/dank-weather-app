@@ -1,32 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:gravity="center"
     android:orientation="vertical"
-    tools:context=".ui.main.CurrentWeatherFragment"
-    >
-
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/page_title_now"
-        android:textAlignment="center"
-        android:textSize="24sp" />
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:background="#c0c0c0"/>
+    tools:context=".ui.main.CurrentWeatherFragment">
 
     <TextView
         android:id="@+id/current_temp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textAlignment="center"
-        android:textSize="48sp"
+        android:textSize="96sp"
         android:textStyle="bold" />
 
     <TextView
@@ -34,26 +20,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textAlignment="center"
+        android:textAllCaps="false"
         android:textSize="48sp"
         android:textStyle="bold" />
 
     <TextView
         android:id="@+id/current_weather_details"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textAlignment="center"
-        android:textSize="20sp" />
-
-    <TextView
-        android:id="@+id/current_dewpt"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textAlignment="center"
-        android:textAllCaps="true"
-        android:textSize="20sp" />
-
-    <TextView
-        android:id="@+id/current_clouds"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textAlignment="center"

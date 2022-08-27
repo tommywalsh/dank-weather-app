@@ -120,16 +120,22 @@ public class HourlyWeatherFragment extends Fragment {
 
             holder.hourWidget.setText(Utils.getHourString(forecast.when));
             holder.tempWidget.setText(Utils.getTemperatureString(forecast.temperature));
-            holder.dewpointWidget.setText(Utils.getDewpointStringId(forecast.dewpoint));
+            holder.weatherDetailsWidget.setText(Utils.getPopString(HourlyWeatherFragment.this, forecast.pop));
 
-            int detailId = getResources().getIdentifier(Utils.getWeatherCodeLookupString(forecast.weatherCode), "string", getContext().getPackageName());
-            int groupId = getResources().getIdentifier(Utils.getWeatherCodeGroupLookupString(forecast.weatherCode), "string", getContext().getPackageName());
-            if (detailId == 0 || groupId == 0) {
-                holder.weatherSummaryWidget.setText("");
-                holder.weatherDetailsWidget.setText("");
+            int groupId = Utils.getWeatherGroupCode(forecast.weatherCode);
+            if (groupId == 300) {
+                // For Drizzle, we can just say "drizzle" (the group string)
+                holder.weatherSummaryWidget.setText(Utils.getResourceId(HourlyWeatherFragment.this, Utils.getWeatherCodeGroupLookupString(forecast.weatherCode)));
             } else {
-                holder.weatherSummaryWidget.setText(Utils.getGeneralWeatherDescriptionId(HourlyWeatherFragment.this, forecast.weatherCode, forecast.clouds));
-                holder.weatherDetailsWidget.setText(Utils.getWeatherDetailsString(HourlyWeatherFragment.this, forecast.weatherCode, forecast.pop));
+                // For every other weather type, we want more details, so we use the string for the weather code
+                holder.weatherSummaryWidget.setText(Utils.getResourceId(HourlyWeatherFragment.this, Utils.getWeatherCodeLookupString(forecast.weatherCode)));
+            }
+
+            // Only show dewpoint info if there's no precipitation
+            if (groupId == 800) {
+                holder.dewpointWidget.setText(Utils.getDewpointStringId(forecast.dewpoint));
+            } else {
+                holder.dewpointWidget.setText("");
             }
         }
 

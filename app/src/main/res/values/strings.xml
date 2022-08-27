@@ -1,9 +1,9 @@
 <resources>
     <string name="app_name">Weather</string>
 
-    <string name="tab_text_now">Now</string>
-    <string name="tab_text_today">Today</string>
-    <string name="tab_text_future">Future</string>
+    <string name="tab_text_now">Current</string>
+    <string name="tab_text_today">Hourly</string>
+    <string name="tab_text_future">Daily</string>
 
     <string name="page_title_now">Current Conditions</string>
 
