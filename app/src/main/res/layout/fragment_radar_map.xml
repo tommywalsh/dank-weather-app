@@ -3,14 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.main.DailyWeatherFragment">
+    tools:context=".ui.main.RadarMapFragment">
 
-    <androidx.recyclerview.widget.RecyclerView
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        android:orientation="vertical"
-        app:spanCount="1"
-        android:id="@+id/dailyList"
+    <WebView
+        android:id="@+id/webView"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

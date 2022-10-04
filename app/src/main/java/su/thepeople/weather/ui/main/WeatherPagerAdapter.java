@@ -38,6 +38,7 @@ public class WeatherPagerAdapter extends FragmentPagerAdapter {
         tabDefinitions.add(new TabDefinition(R.string.tab_text_now, CurrentWeatherFragment::new));
         tabDefinitions.add(new TabDefinition(R.string.tab_text_today, HourlyWeatherFragment::new));
         tabDefinitions.add(new TabDefinition(R.string.tab_text_future, DailyWeatherFragment::new));
+        tabDefinitions.add(new TabDefinition(R.string.tab_text_radar, RadarMapFragment::new));
     }
 
     @NonNull

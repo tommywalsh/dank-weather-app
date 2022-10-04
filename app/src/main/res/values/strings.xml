@@ -4,6 +4,7 @@
     <string name="tab_text_now">Current</string>
     <string name="tab_text_today">Hourly</string>
     <string name="tab_text_future">Daily</string>
+    <string name="tab_text_radar">Radar</string>
 
     <string name="dew_pt_above_70">Oppressive</string>
     <string name="dew_pt_60s">Dank</string>
