@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment;
 import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 import su.thepeople.weather.R;
 
@@ -49,7 +50,7 @@ public class Utils {
     }
 
     public static String getWeatherCodeLookupString(int weatherCode) {
-        return String.format("weather_code_%d", weatherCode);
+        return String.format(Locale.getDefault(), "weather_code_%d", weatherCode);
     }
 
     public static int getWeatherGroupCode(int weatherCode) {
@@ -57,74 +58,15 @@ public class Utils {
     }
 
     public static String getWeatherCodeGroupLookupString(int weatherCode) {
-        return String.format("weather_group_%d", getWeatherGroupCode(weatherCode));
+        return String.format(Locale.getDefault(), "weather_group_%d", getWeatherGroupCode(weatherCode));
     }
-
-    private static final int NO_PRECIP_GROUP_CODE = 800;
 
     public static int getResourceId(Fragment ui, String resourceName) {
-        return ui.getResources().getIdentifier(resourceName, "string", ui.getContext().getPackageName());
-    }
-
-    public static int getGeneralWeatherDescriptionId(Fragment ui, int weatherCode, double cloudCover) {
-        int groupCode = getWeatherGroupCode(weatherCode);
-        if (groupCode == NO_PRECIP_GROUP_CODE) {
-            // When there's no precipitation, we report the cloud cover
-            return getCloudinessStringId(cloudCover);
-        } else {
-            return getResourceId(ui, getWeatherCodeGroupLookupString(weatherCode));
-        }
-    }
-
-    public static int getWeatherSummaryId(Fragment ui, int weatherCode) {
-        int groupCode = getWeatherGroupCode(weatherCode);
-        if (groupCode == NO_PRECIP_GROUP_CODE) {
-            // When there's no precipitation, we report the cloudiness (which is the weather code)
-            return getResourceId(ui, getWeatherCodeLookupString(weatherCode));
-        } else {
-            // When there is precipitation, we report the precipitation type (the group)
-            return getResourceId(ui, getWeatherCodeGroupLookupString(weatherCode));
-        }
+        return ui.getResources().getIdentifier(resourceName, "string", ui.requireContext().getPackageName());
     }
 
     public static String getPopString(Fragment ui, double pop) {
         String popString = ui.getResources().getString(R.string.pop);
         return String.format("%s: %s%%", popString, roundedDecimal.format(pop*100.0));
-    }
-
-    public static String getWeatherDetailsString(Fragment ui, int weatherCode, double pop) {
-        int groupCode = getWeatherGroupCode(weatherCode);
-        if (groupCode == NO_PRECIP_GROUP_CODE) {
-            // When there's no precipitation, we report the precipitation chance
-            return getPopString(ui, pop);
-        } else {
-            // When there is precipitation, we report the precipitation details (the weather code)
-            int id = getResourceId(ui, getWeatherCodeLookupString(weatherCode));
-            return ui.getResources().getString(id);
-        }
-    }
-
-
-    public static int getCloudinessStringId(double cloudCover) {
-        /*
-         * One standard protocol is to divide the sky into 8 parts and then count how many of them
-         * are obscured by clouds. Different numbers of obscured sky parts give different text
-         * descriptions.
-         *
-         * We have a percentage cloud cover. To approximate the above, we divide the 0%-100% scale
-         * into ninths, and ask "In which part of our scale is our cloud cover percentage?".
-         */
-        cloudCover /= 100.0;
-        if (cloudCover >= 8.0 / 9.0) {
-            return R.string.clouds_top_eighth;
-        } else if (cloudCover >= 6.0 / 9.0) {
-            return R.string.clouds_6_to_7_eighths;
-        } else if (cloudCover > 3.0 / 9.0) {
-            return R.string.clouds_3_to_5_eighths;
-        } else if (cloudCover > 1.0 / 9.0) {
-            return R.string.clouds_1_to_2_eighths;
-        } else {
-            return R.string.clouds_bottom_eighth;
-        }
     }
 }

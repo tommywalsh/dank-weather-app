@@ -1,4 +1,13 @@
 <resources>
+    <!--
+       The API we are using defines its own set of "weather codes", organized into "groups".
+
+       The group defines the general type of weather: Rain, Snow, No Precipitation, etc.
+
+       The code defines a more specific type of weather: Light Rain, Heavy Snow, Partly Cloudy, etc.
+
+       This file defines the description of each group and code.
+       -->
     <string name="weather_group_200">Thunderstorms</string>
     <string name="weather_group_300">Drizzle</string>
     <string name="weather_group_500">Rain</string>

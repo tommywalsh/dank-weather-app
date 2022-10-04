@@ -21,6 +21,9 @@ public class WeatherFetcher {
     private final MessagePasser messagePasser;
     private final String apiKey;
 
+    private final static String API_ADDRESS = "https://api.openweathermap.org/data/3.0/onecall";
+    private final static String IMPERIAL_UNITS = "imperial";
+
     public WeatherFetcher(MessagePasser messagePasser, String apiKey) {
         this.messagePasser = messagePasser;
         this.apiKey = apiKey;
@@ -29,8 +32,8 @@ public class WeatherFetcher {
     private URL getWeatherURL() {
         return URLBuilder
                 .url()
-                .withHttpsAddress("https://api.openweathermap.org/data/3.0/onecall")
-                .withParam("units", "imperial")
+                .withHttpsAddress(API_ADDRESS)
+                .withParam("units", IMPERIAL_UNITS)
                 .withParam("appid", apiKey)
 
                 // TODO: Don't hard-code Somerville!

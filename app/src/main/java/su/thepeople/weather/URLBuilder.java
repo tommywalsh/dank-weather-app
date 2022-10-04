@@ -48,10 +48,7 @@ public class URLBuilder {
 
     private static String encode(String raw) {
         try {
-            /*
-             * URLEncoder requires you to pass in an encoding, and also requires that encoding
-             * to be "UTF-8".
-             */
+            // URLEncoder requires you to pass in an encoding, and also requires that encoding to be "UTF-8".
             return URLEncoder.encode(raw, "UTF-8");
         } catch (java.io.UnsupportedEncodingException e) {
             // This should never happen

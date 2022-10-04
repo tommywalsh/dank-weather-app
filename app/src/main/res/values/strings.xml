@@ -5,20 +5,11 @@
     <string name="tab_text_today">Hourly</string>
     <string name="tab_text_future">Daily</string>
 
-    <string name="page_title_now">Current Conditions</string>
-
     <string name="dew_pt_above_70">Oppressive</string>
     <string name="dew_pt_60s">Dank</string>
     <string name="dew_pt_50s">Comfy</string>
     <string name="dew_pt_40s">Dry</string>
     <string name="dew_pt_below_40">Crispy</string>
 
-    <string name="clouds_top_eighth">Overcast</string>
-    <string name="clouds_6_to_7_eighths">Mostly Cloudy</string>
-    <string name="clouds_3_to_5_eighths">Partly Cloudy</string>
-    <string name="clouds_1_to_2_eighths">Mostly Clear</string>
-    <string name="clouds_bottom_eighth">Clear</string>
-
     <string name="pop">pop</string>
-
 </resources>

@@ -9,10 +9,6 @@ public class WeatherReport implements Serializable {
 
     private static LocalDateTime lastUpdateTime;
 
-    // This is a crude-but-good-enough scheme for determining how recent a report is.
-    public void finalizeUpdate() {
-        lastUpdateTime = LocalDateTime.now();
-    }
     public WeatherReport() {
         lastUpdateTime = LocalDateTime.MIN;
     }

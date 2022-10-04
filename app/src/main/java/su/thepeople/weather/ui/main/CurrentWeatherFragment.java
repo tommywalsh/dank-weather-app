@@ -54,7 +54,7 @@ public class CurrentWeatherFragment extends Fragment {
                 weatherDetailsWidget.setText(Utils.getDewpointStringId(report.current.dewpoint));
             } else {
                 // Otherwise, no additional info is needed
-                weatherDetailsWidget.setText("Test");
+                weatherDetailsWidget.setText("");
             }
         }
 

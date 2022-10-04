@@ -6,12 +6,10 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModelStore;
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Looper;
-import android.util.Log;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -27,27 +25,22 @@ public class MainActivity extends AppCompatActivity {
 
     MutableLiveData<WeatherReport> weatherReport = new MutableLiveData<>();
 
-    ViewModelStore modelStore;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Force creation of singleton.  Maybe not necessary
-        WeatherData.latestReport();
-
-        modelStore = new ViewModelStore();
-
         su.thepeople.weather.databinding.ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        // Set up our tabbed pager
         WeatherPagerAdapter weatherPagerAdapter = new WeatherPagerAdapter(this, getSupportFragmentManager());
         ViewPager viewPager = binding.viewPager;
         viewPager.setAdapter(weatherPagerAdapter);
         TabLayout tabs = binding.tabs;
         tabs.setupWithViewPager(viewPager);
-        FloatingActionButton fab = binding.fab;
 
+        // Utility to let other threads pass messages to us.
         MessagePasser passer = new MessagePasser(Looper.getMainLooper(), this::onNewWeatherReportReceived);
 
         /*
@@ -62,19 +55,15 @@ public class MainActivity extends AppCompatActivity {
         String apiKey = getResources().getString(R.string.weather_api_key);
         fetcher = new WeatherFetcher(passer, apiKey);
 
+        // TODO: Either remove this floating button or at least change its appearance.
+        FloatingActionButton fab = binding.fab;
         fab.setOnClickListener(view -> fetcher.requestWeatherUpdate());
     }
 
-    private Timer weatherReportTimer = new Timer();
+    private final Timer weatherReportTimer = new Timer();
 
-    private void requestNewReport() {
-        // Regardless of WHY we're being asked to request a new report, we need to:
-        // 1) Cancel any pending timer events
-        // 2) Actually request a new report
-        // 3) Start a new timer
-    }
-    private Duration TOO_OLD = Duration.ofHours(3);
-    private Duration UP_TO_DATE = Duration.ofMinutes(5);
+    private final static Duration TOO_OLD = Duration.ofHours(3);
+    private final static Duration UP_TO_DATE = Duration.ofMinutes(5);
 
     @Override public void onResume() {
         super.onResume();
@@ -122,12 +111,6 @@ public class MainActivity extends AppCompatActivity {
     @Override protected void onPause() {
         weatherReportTimer.cancel();
         super.onPause();
-    }
-
-    @Override
-    protected void onDestroy() {
-        modelStore.clear();
-        super.onDestroy();
     }
 
     private void onNewWeatherReportReceived(WeatherReport newReport) {
