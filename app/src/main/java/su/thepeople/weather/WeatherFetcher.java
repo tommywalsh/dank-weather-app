@@ -146,12 +146,16 @@ public class WeatherFetcher {
     }
 
     private void onFetchCompleted(JSONObject fetchResult) {
+        Log.d("WeatherFetcher", "weather report received");
+
         isWaitingForExternallyRequestedUpdate = false;
         WeatherReport report = processResult(fetchResult);
         messagePasser.sendNewWeatherReport(report);
     }
 
     private void onLocationRetrieved(Location location) {
+        Log.d("WeatherFetcher", "location received, will request weather report now");
+
         currentLocation = new WeatherReport.LatLng(location.getLatitude(), location.getLongitude());
         requestWeatherUpdate();
     }
@@ -161,26 +165,40 @@ public class WeatherFetcher {
     }
 
     private void requestLocation() {
+        Log.d("WeatherFetcher", "location requested internally");
+
         try {
+            Log.d("WeatherFetcher", "asking provider for location");
+
             Task<Location> locationTask = locationProvider.getCurrentLocation(LocationRequest.PRIORITY_LOW_POWER, cancelSource.getToken());
             locationTask.addOnSuccessListener(this::onLocationRetrieved);
             locationTask.addOnFailureListener(this::onLocationFailed);
         } catch(SecurityException e) {
             // If we can't get the real location, use Somerville as a default, and request a new weather update.
+            Log.d("WeatherFetcher", "security exception received on location call");
+
             currentLocation = new WeatherReport.LatLng(42.379, -71.0998);
             CompletableFuture.runAsync(this::requestWeatherUpdate);
-        }
+        } catch (Exception e) {{
+            Log.d("WeatherFetcher", "another exception received on location call", e);
+        }}
     }
 
     public void fullUpdate() {
+        Log.d("WeatherFetcher", "full update requested");
+
         // A full update means we might have changed location.  Fire off a location request, which will in turn update the weather.
         requestLocation();
     }
 
     public void updateWeatherForLastLocation() {
+        Log.d("WeatherFetcher", "update requested for last location");
+
         // In this case, we assume the device is at the same location it was before (if indeed there was a "before").
         if (isWaitingForExternallyRequestedUpdate) {
             // We're already requesting weather. Don't send a second request.
+            Log.d("WeatherFetcher", "we're already waiting for a report, so ignore this request");
+
             return;
         }
         isWaitingForExternallyRequestedUpdate = true;
@@ -188,14 +206,22 @@ public class WeatherFetcher {
     }
 
     private void requestWeatherUpdate() {
+        Log.d("WeatherFetcher", "generic update requested internally");
+
         if (currentLocation == null) {
+            Log.d("WeatherFetcher", "generic update is for location since we don't have one yet");
+
             // We have not determined an initial location yet!  Request it, and that will automatically fetch a new weather update afterwards.
             requestLocation();
         } else {
+            Log.d("WeatherFetcher", "dispatching request to weather API async");
+
             CompletableFuture
                     .supplyAsync(apiCaller())
                     .thenAccept(this::onFetchCompleted)
                     .exceptionally(e -> {
+                        Log.d("WeatherFetcher", "weather API call exception", e);
+
                         isWaitingForExternallyRequestedUpdate = false;
                         return null;
                     });

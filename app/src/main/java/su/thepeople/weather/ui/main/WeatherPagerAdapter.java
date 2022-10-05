@@ -1,6 +1,7 @@
 package su.thepeople.weather.ui.main;
 
 import android.content.Context;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -11,6 +12,7 @@ import androidx.fragment.app.FragmentPagerAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
 import java.util.function.Supplier;
 
 import su.thepeople.weather.R;
@@ -27,13 +29,15 @@ public class WeatherPagerAdapter extends FragmentPagerAdapter {
         }
     }
 
-    private static final List<TabDefinition> tabDefinitions = new ArrayList<>();
+    private final List<TabDefinition> tabDefinitions = new ArrayList<>();
 
     private final Context context;
 
     public WeatherPagerAdapter(Context context, FragmentManager fm) {
         super(fm);
         this.context = context;
+
+        Log.d("pager", "Adding new tab definitions due to being constructed");
 
         tabDefinitions.add(new TabDefinition(R.string.tab_text_now, CurrentWeatherFragment::new));
         tabDefinitions.add(new TabDefinition(R.string.tab_text_today, HourlyWeatherFragment::new));

@@ -11,6 +11,7 @@ import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Looper;
+import android.util.Log;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -29,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d("MainActivity", "creating");
 
         su.thepeople.weather.databinding.ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -62,13 +64,17 @@ public class MainActivity extends AppCompatActivity {
         fetcher = new WeatherFetcher(passer, apiKey, locationProvider);
     }
 
-    private final Timer weatherReportTimer = new Timer();
+    private Timer weatherReportTimer;
 
     private final static Duration TOO_OLD = Duration.ofHours(3);
     private final static Duration UP_TO_DATE = Duration.ofMinutes(5);
 
     @Override public void onResume() {
         super.onResume();
+
+        weatherReportTimer = new Timer();
+
+        Log.d("MainActivity", "resuming");
 
         // Four cases:
         //   1) We don't have a report at all
@@ -95,15 +101,18 @@ public class MainActivity extends AppCompatActivity {
             // Nothing to do for Case 4
         }
         if (throwAway) {
+            Log.d("MainActivity", "trashing old weather report at resume time");
             WeatherData.latestReport().setValue(null);
         }
         if (makeRequest) {
+            Log.d("MainActivity", "requesting new report (full update) at resume time");
             fetcher.fullUpdate();
         }
 
         TimerTask task = new TimerTask() {
             @Override
             public void run() {
+                Log.d("MainActivity", "Requesting report refresh (same location) on timer tick");
                 fetcher.updateWeatherForLastLocation();
             }
         };
@@ -112,10 +121,14 @@ public class MainActivity extends AppCompatActivity {
 
     @Override protected void onPause() {
         weatherReportTimer.cancel();
+        weatherReportTimer = null;
+        Log.d("MainActivity", "pausing");
+
         super.onPause();
     }
 
     private void onNewWeatherReportReceived(WeatherReport newReport) {
+        Log.d("MainActivity", "received weather report");
         weatherReport.setValue(newReport);
         WeatherData.latestReport().setValue(newReport);
     }
