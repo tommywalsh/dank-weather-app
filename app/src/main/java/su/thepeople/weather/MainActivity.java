@@ -2,7 +2,8 @@ package su.thepeople.weather;
 
 import android.os.Bundle;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.material.tabs.TabLayout;
 
 import androidx.lifecycle.MutableLiveData;
@@ -24,7 +25,6 @@ public class MainActivity extends AppCompatActivity {
     private WeatherFetcher fetcher;
 
     MutableLiveData<WeatherReport> weatherReport = new MutableLiveData<>();
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,11 +53,13 @@ public class MainActivity extends AppCompatActivity {
          * </resources>
          */
         String apiKey = getResources().getString(R.string.weather_api_key);
-        fetcher = new WeatherFetcher(passer, apiKey);
 
-        // TODO: Either remove this floating button or at least change its appearance.
-        FloatingActionButton fab = binding.fab;
-        fab.setOnClickListener(view -> fetcher.requestWeatherUpdate());
+        /*
+         * Set up a location provider for the Weather Fetcher.
+         */
+        FusedLocationProviderClient locationProvider = LocationServices.getFusedLocationProviderClient(this);
+
+        fetcher = new WeatherFetcher(passer, apiKey, locationProvider);
     }
 
     private final Timer weatherReportTimer = new Timer();
@@ -96,16 +98,16 @@ public class MainActivity extends AppCompatActivity {
             WeatherData.latestReport().setValue(null);
         }
         if (makeRequest) {
-            fetcher.requestWeatherUpdate();
+            fetcher.fullUpdate();
         }
 
         TimerTask task = new TimerTask() {
             @Override
             public void run() {
-                fetcher.requestWeatherUpdate();
+                fetcher.updateWeatherForLastLocation();
             }
         };
-        weatherReportTimer.schedule(task, 0, UP_TO_DATE.toMillis());
+        weatherReportTimer.schedule(task, UP_TO_DATE.toMillis(), UP_TO_DATE.toMillis());
     }
 
     @Override protected void onPause() {

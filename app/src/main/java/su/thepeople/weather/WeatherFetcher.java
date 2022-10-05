@@ -1,5 +1,13 @@
 package su.thepeople.weather;
 
+import android.location.Location;
+import android.util.Log;
+
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.tasks.CancellationTokenSource;
+import com.google.android.gms.tasks.Task;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -8,6 +16,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.function.Supplier;
@@ -17,29 +26,34 @@ import java.util.function.Supplier;
  */
 public class WeatherFetcher {
 
-    private boolean isWaiting = false;
+    private boolean isWaitingForExternallyRequestedUpdate = false;
     private final MessagePasser messagePasser;
     private final String apiKey;
 
     private final static String API_ADDRESS = "https://api.openweathermap.org/data/3.0/onecall";
     private final static String IMPERIAL_UNITS = "imperial";
 
-    public WeatherFetcher(MessagePasser messagePasser, String apiKey) {
+    private final FusedLocationProviderClient locationProvider;
+
+    private WeatherReport.LatLng currentLocation = null;
+    private final CancellationTokenSource cancelSource = new CancellationTokenSource();
+
+    public WeatherFetcher(MessagePasser messagePasser, String apiKey, FusedLocationProviderClient locationProvider) {
         this.messagePasser = messagePasser;
         this.apiKey = apiKey;
+        this.locationProvider = locationProvider;
     }
 
     private URL getWeatherURL() {
+        assert currentLocation != null;
+
         return URLBuilder
                 .url()
                 .withHttpsAddress(API_ADDRESS)
                 .withParam("units", IMPERIAL_UNITS)
                 .withParam("appid", apiKey)
-
-                // TODO: Don't hard-code Somerville!
-                .withParam("lat", "42.379")
-                .withParam("lon", "-71.0998")
-
+                .withParam("lat", String.format(Locale.US, "%f", currentLocation.lat))
+                .withParam("lon", String.format(Locale.US, "%f", currentLocation.lng))
                 .build();
     }
 
@@ -60,6 +74,7 @@ public class WeatherFetcher {
             // Data that applies to all times
             int offsetL = result.getInt("timezone_offset");
             ZoneOffset offset = ZoneOffset.ofTotalSeconds(offsetL);
+            report.location = currentLocation;
 
             // Data that applies to current conditions
             JSONObject current = result.getJSONObject("current");
@@ -131,23 +146,59 @@ public class WeatherFetcher {
     }
 
     private void onFetchCompleted(JSONObject fetchResult) {
-        isWaiting = false;
+        isWaitingForExternallyRequestedUpdate = false;
         WeatherReport report = processResult(fetchResult);
         messagePasser.sendNewWeatherReport(report);
     }
 
-    public void requestWeatherUpdate() {
-        if (isWaiting) {
+    private void onLocationRetrieved(Location location) {
+        currentLocation = new WeatherReport.LatLng(location.getLatitude(), location.getLongitude());
+        requestWeatherUpdate();
+    }
+
+    private void onLocationFailed(Exception e) {
+        Log.d("debug", "Location failed", e);
+    }
+
+    private void requestLocation() {
+        try {
+            Task<Location> locationTask = locationProvider.getCurrentLocation(LocationRequest.PRIORITY_LOW_POWER, cancelSource.getToken());
+            locationTask.addOnSuccessListener(this::onLocationRetrieved);
+            locationTask.addOnFailureListener(this::onLocationFailed);
+        } catch(SecurityException e) {
+            // If we can't get the real location, use Somerville as a default, and request a new weather update.
+            currentLocation = new WeatherReport.LatLng(42.379, -71.0998);
+            CompletableFuture.runAsync(this::requestWeatherUpdate);
+        }
+    }
+
+    public void fullUpdate() {
+        // A full update means we might have changed location.  Fire off a location request, which will in turn update the weather.
+        requestLocation();
+    }
+
+    public void updateWeatherForLastLocation() {
+        // In this case, we assume the device is at the same location it was before (if indeed there was a "before").
+        if (isWaitingForExternallyRequestedUpdate) {
             // We're already requesting weather. Don't send a second request.
             return;
         }
-        isWaiting = true;
-        CompletableFuture
-            .supplyAsync(apiCaller())
-            .thenAccept(this::onFetchCompleted)
-            .exceptionally(e -> {
-                isWaiting = false;
-                return null;
-            });
+        isWaitingForExternallyRequestedUpdate = true;
+        requestWeatherUpdate();
+    }
+
+    private void requestWeatherUpdate() {
+        if (currentLocation == null) {
+            // We have not determined an initial location yet!  Request it, and that will automatically fetch a new weather update afterwards.
+            requestLocation();
+        } else {
+            CompletableFuture
+                    .supplyAsync(apiCaller())
+                    .thenAccept(this::onFetchCompleted)
+                    .exceptionally(e -> {
+                        isWaitingForExternallyRequestedUpdate = false;
+                        return null;
+                    });
+        }
     }
 }
