@@ -66,7 +66,6 @@ public class WeatherFetcher {
                     Log.e(L, "Error getting forecast", e);
                     return null;
                 });
-
     }
 
     private WeatherReport processResult(JSONObject result, SimpleLocation location) {
@@ -147,5 +146,4 @@ public class WeatherFetcher {
         }
         return report;
     }
-
 }

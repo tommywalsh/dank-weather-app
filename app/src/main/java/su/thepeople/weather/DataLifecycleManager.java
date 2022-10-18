@@ -8,15 +8,12 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
-/**
- * Handles all data requests and responses to/from the network
- */
 public class DataLifecycleManager {
 
     private static final String L = "DataLifecycleManager";
 
-    private static final Duration LOCATION_LIFETIME = Duration.ofMinutes(2);
-    private static final Duration WEATHER_LIFETIME = Duration.ofMinutes(1);
+    private static final Duration LOCATION_LIFETIME = Duration.ofHours(1);
+    private static final Duration WEATHER_LIFETIME = Duration.ofMinutes(10);
 
     private final LocationFetcher locationFetcher;
     private final WeatherFetcher weatherFetcher;
@@ -77,7 +74,6 @@ public class DataLifecycleManager {
         } else {
             Log.d(L, "Location and forecast are both up-to-date. No need to update.");
 
-            // TODO find minimum wait time based on location as well
             Duration age = Duration.between(workingReport.getUpdateTime(), now);
             nextUpdateWait = WEATHER_LIFETIME.minus(age);
         }

@@ -77,5 +77,4 @@ public class LocationFetcher {
         }
         return String.format(Locale.US, "lat %f, lng %f", location.getLatitude(), location.getLongitude());
     }
-
 }
