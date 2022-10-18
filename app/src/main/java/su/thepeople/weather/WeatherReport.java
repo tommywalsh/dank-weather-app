@@ -7,16 +7,9 @@ import java.util.List;
 
 public class WeatherReport implements Serializable {
 
-    public static class LatLng {
-        public double lat;
-        public double lng;
-        public LatLng(double lat, double lng) {
-            this.lat = lat;
-            this.lng = lng;
-        }
-    }
-
-    private static LocalDateTime lastUpdateTime;
+    private LocalDateTime lastUpdateTime;
+    public String locationName;
+    public SimpleLocation location;
 
     public WeatherReport() {
         lastUpdateTime = LocalDateTime.MIN;
@@ -50,6 +43,4 @@ public class WeatherReport implements Serializable {
     public List<Forecast> hourly = new ArrayList<>();
 
     public List<DailyForecast> daily = new ArrayList<>();
-
-    public LatLng location;
 }

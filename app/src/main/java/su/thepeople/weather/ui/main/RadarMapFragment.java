@@ -14,6 +14,7 @@ import java.net.URL;
 import java.util.Locale;
 
 import su.thepeople.weather.R;
+import su.thepeople.weather.SimpleLocation;
 import su.thepeople.weather.URLBuilder;
 import su.thepeople.weather.WeatherData;
 import su.thepeople.weather.WeatherReport;
@@ -26,7 +27,7 @@ public class RadarMapFragment extends Fragment {
         // Required empty public constructor
     }
 
-    private URL getRadarUrl(WeatherReport.LatLng location) {
+    private URL getRadarUrl(SimpleLocation location) {
         int zoomLevel = 7;
         // Rainviewer expects US-formatted numbers (regardless of whatever locale user has set)
         String mapSpec = String.format(Locale.US, "%f,%f,%d", location.lat, location.lng, zoomLevel);

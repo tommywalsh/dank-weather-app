@@ -1,5 +1,6 @@
 package su.thepeople.weather;
 
+import android.location.Geocoder;
 import android.os.Bundle;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -12,9 +13,10 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Looper;
 import android.util.Log;
+import android.widget.TextView;
 
 import java.time.Duration;
-import java.time.LocalDateTime;
+import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -22,10 +24,14 @@ import su.thepeople.weather.ui.main.WeatherPagerAdapter;
 import su.thepeople.weather.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
+    private static final String L = "MainActivity";
 
-    private WeatherFetcher fetcher;
+    private DataLifecycleManager fetcher;
+    private TextView titleWidget;
 
     MutableLiveData<WeatherReport> weatherReport = new MutableLiveData<>();
+
+    private Timer dataRefreshTimer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +40,8 @@ public class MainActivity extends AppCompatActivity {
 
         su.thepeople.weather.databinding.ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        titleWidget = binding.title;
 
         // Set up our tabbed pager
         WeatherPagerAdapter weatherPagerAdapter = new WeatherPagerAdapter(this, getSupportFragmentManager());
@@ -57,78 +65,45 @@ public class MainActivity extends AppCompatActivity {
         String apiKey = getResources().getString(R.string.weather_api_key);
 
         /*
-         * Set up a location provider for the Weather Fetcher.
+         * Set up the data fetcher
          */
         FusedLocationProviderClient locationProvider = LocationServices.getFusedLocationProviderClient(this);
-
-        fetcher = new WeatherFetcher(passer, apiKey, locationProvider);
+        Geocoder geocoder = new Geocoder(this, Locale.US);
+        fetcher = new DataLifecycleManager(passer, apiKey, locationProvider, geocoder);
     }
 
-    private Timer weatherReportTimer;
+    private static TimerTask taskOf(Runnable r) {
+        return new TimerTask() {
+            public void run() {
+                r.run();
+            }
+        };
+    }
 
-    private final static Duration TOO_OLD = Duration.ofHours(3);
-    private final static Duration UP_TO_DATE = Duration.ofMinutes(5);
+    private void requestDataUpdate() {
+        Duration updateWaitTime = fetcher.refreshAsNecessary();
+        Log.d(L, "Wait time " + updateWaitTime.toString());
+        dataRefreshTimer.schedule(taskOf(this::requestDataUpdate), updateWaitTime.toMillis());
+    }
 
     @Override public void onResume() {
         super.onResume();
 
-        weatherReportTimer = new Timer();
-
         Log.d("MainActivity", "resuming");
-
-        // Four cases:
-        //   1) We don't have a report at all
-        //   2) We have a report, but it is very old
-        //   3) We have a report which is not up-to-date, but is "new enough"
-        //   4) We have an up-to-date report
-        WeatherReport latestReport = WeatherData.latestReport().getValue();
-
-        boolean makeRequest = false;
-        boolean throwAway = false;
-        if (latestReport == null) {
-            // Case 1
-            makeRequest = true;
-        } else {
-            Duration age = Duration.between(latestReport.getUpdateTime(), LocalDateTime.now());
-            if (age.compareTo(TOO_OLD) > 0) {
-                // Case 2
-                makeRequest = true;
-                throwAway = true;
-            } else if (age.compareTo(UP_TO_DATE) > 0) {
-                // Case 3
-                makeRequest = true;
-            }
-            // Nothing to do for Case 4
-        }
-        if (throwAway) {
-            Log.d("MainActivity", "trashing old weather report at resume time");
-            WeatherData.latestReport().setValue(null);
-        }
-        if (makeRequest) {
-            Log.d("MainActivity", "requesting new report (full update) at resume time");
-            fetcher.fullUpdate();
-        }
-
-        TimerTask task = new TimerTask() {
-            @Override
-            public void run() {
-                Log.d("MainActivity", "Requesting report refresh (same location) on timer tick");
-                fetcher.updateWeatherForLastLocation();
-            }
-        };
-        weatherReportTimer.schedule(task, UP_TO_DATE.toMillis(), UP_TO_DATE.toMillis());
+        dataRefreshTimer = new Timer();
+        requestDataUpdate();
     }
 
     @Override protected void onPause() {
-        weatherReportTimer.cancel();
-        weatherReportTimer = null;
+        dataRefreshTimer.cancel();
+        dataRefreshTimer = null;
         Log.d("MainActivity", "pausing");
-
         super.onPause();
     }
 
     private void onNewWeatherReportReceived(WeatherReport newReport) {
         Log.d("MainActivity", "received weather report");
+        titleWidget.setText(newReport.locationName);
         weatherReport.setValue(newReport);
         WeatherData.latestReport().setValue(newReport);
     }
